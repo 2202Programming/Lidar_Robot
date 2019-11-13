@@ -12,7 +12,8 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.CanbusDistanceSensor;
+//import frc.robot.CanbusDistanceSensor;
+import frc.robot.LIDAR_Subsystem;
 
 
 
@@ -31,14 +32,27 @@ public class Robot extends TimedRobot {
 
   public static Motor_Subsystem  m_motor = new Motor_Subsystem();
   public static XboxController m_controller = new XboxController(0);
+  public static LIDAR_Subsystem m_lidar = new LIDAR_Subsystem();
+  /*
   public static int distanceSensorLoad = 20;
   public static int distanceSensorLoad2 = 21;
   public static byte[] hwdataLoad = new byte[8];
   public static double loadSensorSerial;
+  */
   public static int b = 0; 
   
+  
   //distance between two lidar
-  public static final double LIDAR_DIST = 57.15;
+ //public static final double LIDAR_DIST = 57.15;
+  
+  public double P = 1;
+  public double I = 0.01;
+  public double Error = 0.0;
+  public double desiredAngle = 0.0;
+  public double integral = 0.0;
+  public double powerRight;
+  public double powerLeft;
+    
 
 
 
@@ -106,45 +120,12 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    int[] temp = { 0, 0 };
-    int[] temp2 = {0, 0};
-  
-      if(b%20 == 0){
-
-      temp = CanbusDistanceSensor.getDistanceMM(distanceSensorLoad);
-
-      double lidarValue = (double)temp[0];
-      
-        SmartDashboard.putNumber("Lidar 20", Math.round(lidarValue));
-
-      }
-
-      if(b%20 == 10){
-
-        temp2 = CanbusDistanceSensor.getDistanceMM(distanceSensorLoad2);
-  
-        double lidarValue = (double)temp2[0];
-        
-          SmartDashboard.putNumber("Lidar 21", Math.round(lidarValue));
-  
-        }
-
-      //to print angle to smart dashboard
-      if(b%20 == 15){
-        temp = CanbusDistanceSensor.getDistanceMM(distanceSensorLoad);
-        temp2 = CanbusDistanceSensor.getDistanceMM(distanceSensorLoad2);
-
-        double dist1 = Math.round((double)temp[0]);
-        double dist2 = Math.round((double)temp2[0]);
-        double angle = findAngle(dist1, dist2);
-
-        SmartDashboard.putNumber("Angle", angle);
-
-      }
-
-
-      b++;
-      
+    if(b%20 == 0){
+    double angle = m_lidar.findAngle();
+    SmartDashboard.putNumber("Angle", angle);
+    PID(angle);
+    }
+    b++;
     
   }
 
@@ -155,16 +136,32 @@ public class Robot extends TimedRobot {
   public void testPeriodic() {
   }
 
-  //finds angle of surface lidar is hitting
-  public double findAngle(double dist1, double dist2){
+  public void PID(double angle){
+    
+    Error = angle - desiredAngle;
 
-    double difference = dist1 - dist2;
+    integral += (Error*0.2); //Integral increased by error*time (0.2 seconds is a norm, possibly incorrect)
+    
+    SmartDashboard.putNumber("Integral", integral);
 
-    double angle = Math.atan(difference/LIDAR_DIST) * 100;
+    if(angle > desiredAngle){
 
-    System.out.println("Dist1: " + dist1 + "Dist2: " + dist2 + "angle: " + angle);
+    powerRight = P*Math.abs(Error) +  I*Math.abs(integral);
 
-    return angle;
+    powerLeft = 0;
 
+    }
+    else{
+      powerLeft = P*Math.abs(Error) +  I*Math.abs(integral);
+
+      powerRight = 0; 
+      
+    }
+    SmartDashboard.putNumber("Power Left", powerLeft);
+    SmartDashboard.putNumber("Power Right", powerRight);
+
+
+
+    
   }
 }

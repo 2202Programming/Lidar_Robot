@@ -41,13 +41,12 @@ public class LIDAR_Subsystem extends Subsystem {
 
 //find angle of object lidar is hitting
 public double findAngle(){
-
-  double dist1 = lidar1.getLidar();
   double dist2 = lidar2.getLidar();
+  double dist1 = lidar1.getLidar();
 
   double difference = dist1 - dist2;
 
-  double angle = Math.atan(difference/LIDAR_DIST) * 100;
+  double angle = Math.toDegrees(Math.atan(difference/LIDAR_DIST));
 
   return angle;
 
@@ -57,10 +56,9 @@ public double getDistance(){
   double dist1 = lidar1.getLidar();
   double dist2 = lidar2.getLidar();
 
-  double difference = dist1 - dist2;
-  return difference; 
+  double avg = (dist1 + dist2)/2;
+  return avg; 
 }
-
 
 
 

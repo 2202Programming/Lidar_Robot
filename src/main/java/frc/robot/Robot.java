@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
   public static Motor_Subsystem  m_motor = new Motor_Subsystem();
   public static XboxController m_controller = new XboxController(0);
   public static LIDAR_Subsystem m_lidar = new LIDAR_Subsystem();
-  public static PID pid_distance = new PID(0);
+  public static PID pid_distance = new PID(150);
   public static PID pid_angle = new PID(0);
 
   /*
@@ -54,9 +54,14 @@ public class Robot extends TimedRobot {
   public double Error = 0.0;
   public double desiredAngle = 0.0;
   public double integral = 0.0;
+  */
   public double powerRight;
   public double powerLeft;
-  */
+  public double straightPower;
+  public double turningPowerRight;
+  public double turningPowerLeft;
+
+  
 
 
   /**
@@ -122,15 +127,50 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    if(b%20 == 0){
+    if(b == 0){
     double angle = m_lidar.findAngle();
     SmartDashboard.putNumber("Angle", angle);
-    pid_angle.rightMotor(angle);
-    pid_angle.leftMotor(angle);
-    double distance = m_lidar.getDistance();
-    pid_distance.getMotor(distance);
+   // pid_angle.rightMotor(angle);
+    // pid_angle.leftMotor(angle);
+   // double distance = m_lidar.getDistance();
+    double power = pid_angle.getMotor(angle);
+      if(power > 0){
+        power = Math.abs(power);
+        turningPowerRight = power;
+        turningPowerLeft = 0;
+      }
+      else{
+        power = Math.abs(power);
+        turningPowerLeft = power;
+        turningPowerRight = 0;
+      }
     }
+    if(b == 10){
+      double distance = m_lidar.getDistance();
+      SmartDashboard.putNumber("distance", distance);
+
+      double power = pid_distance.getMotor(distance);
+
+      straightPower = Math.abs(power);
+    }
+
+    powerRight = straightPower + turningPowerRight;
+    powerLeft = straightPower + turningPowerLeft;
+
+
+    SmartDashboard.putNumber("powerRight", powerRight);
+    SmartDashboard.putNumber("powerLeft", powerLeft);
+    SmartDashboard.putNumber("straightPower", straightPower);
+
+    SmartDashboard.putNumber("turningPowerRight", turningPowerRight);
+    SmartDashboard.putNumber("turningPowerLeft", turningPowerLeft);
+
+
     b++;
+
+    if(b == 20){
+      b = 0; 
+    }
     
   }
 

@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 public class PID {
 
-    private double P = 1;
+    private double P = 0.01;
     private double I = 0.01;
     private double Error;
     private double desiredValue;
@@ -94,7 +94,7 @@ public double leftMotor(double angle){
     SmartDashboard.putNumber("Integral", integral);
 
     //Thing in if statement not for sure, must be tested to determine if it applies for the right or left potor;
-      power = P*Math.abs(Error) +  I*Math.abs(integral); 
+      power = P*Error +  I*integral; 
 
 
     SmartDashboard.putNumber("Overall power", power);

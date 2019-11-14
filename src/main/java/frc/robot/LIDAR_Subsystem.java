@@ -53,6 +53,14 @@ public double findAngle(){
 
 }
 
+public double getDistance(){
+  double dist1 = lidar1.getLidar();
+  double dist2 = lidar2.getLidar();
+
+  double difference = dist1 - dist2;
+  return difference; 
+}
+
 
 
 

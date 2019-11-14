@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 //import frc.robot.CanbusDistanceSensor;
 import frc.robot.LIDAR_Subsystem;
+import frc.robot.PID;
 
 
 
@@ -33,6 +34,9 @@ public class Robot extends TimedRobot {
   public static Motor_Subsystem  m_motor = new Motor_Subsystem();
   public static XboxController m_controller = new XboxController(0);
   public static LIDAR_Subsystem m_lidar = new LIDAR_Subsystem();
+  public static PID pid_distance = new PID(0);
+  public static PID pid_angle = new PID(0);
+
   /*
   public static int distanceSensorLoad = 20;
   public static int distanceSensorLoad2 = 21;
@@ -44,7 +48,7 @@ public class Robot extends TimedRobot {
   
   //distance between two lidar
  //public static final double LIDAR_DIST = 57.15;
-  
+  /*
   public double P = 1;
   public double I = 0.01;
   public double Error = 0.0;
@@ -52,9 +56,7 @@ public class Robot extends TimedRobot {
   public double integral = 0.0;
   public double powerRight;
   public double powerLeft;
-    
-
-
+  */
 
 
   /**
@@ -123,7 +125,10 @@ public class Robot extends TimedRobot {
     if(b%20 == 0){
     double angle = m_lidar.findAngle();
     SmartDashboard.putNumber("Angle", angle);
-    PID(angle);
+    pid_angle.rightMotor(angle);
+    pid_angle.leftMotor(angle);
+    double distance = m_lidar.getDistance();
+    pid_distance.getMotor(distance);
     }
     b++;
     
@@ -135,7 +140,8 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
   }
-
+//PID for turning
+/*
   public void PID(double angle){
     
     Error = angle - desiredAngle;
@@ -164,4 +170,5 @@ public class Robot extends TimedRobot {
 
     
   }
+  */
 }
